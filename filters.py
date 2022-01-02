@@ -109,7 +109,30 @@ def create_filters(
     :return: A collection of filters for use with `query`.
     """
     # TODO: Decide how you will represent your filters.
-    return ()
+    filters = []
+
+    if distance_min is not None:
+        distance_min_filter = DistanceMinFilter(operator.ge, distance_min)
+        filters.append(distance_min_filter)
+
+    if distance_max is not None:
+        distance_max_filter = DistanceMaxFilter(operator.le, distance_max)
+        filters.append(distance_max_filter)
+
+    if velocity_min is not None:
+        velocity_min_filter = VelocityMinFilter(operator.ge, velocity_min)
+        filters.append(velocity_min_filter)
+
+    if velocity_max is not None:
+        velocity_max_filter = VelocityMaxFilter(operator.le, velocity_max)
+        filters.append(velocity_max_filter)
+
+    if hazardous is not None:
+        print(hazardous)
+        hazardous_filter = HazardousFilter(operator.eq, hazardous)
+        filters.append(hazardous_filter)
+
+    return filters
 
 
 def limit(iterator, n=None):
@@ -123,3 +146,73 @@ def limit(iterator, n=None):
     """
     # TODO: Produce at most `n` values from the given iterator.
     return iterator
+
+
+class DistanceMinFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - distance_min: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.distance
+
+
+class DistanceMaxFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - distance_max: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.distance
+
+
+class VelocityMinFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - velocity_min: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.velocity
+
+
+class VelocityMaxFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - velocity_max: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.velocity
+
+
+class HazardousFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - hazardous: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.hazardous
