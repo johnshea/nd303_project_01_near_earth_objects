@@ -96,6 +96,5 @@ def write_to_json(results, filename):
 
         data.append(result_dict)
 
-    # print("data: ", data)
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
