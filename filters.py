@@ -163,8 +163,20 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if n is None or n == 0:
+        for i, element in enumerate(iterator):
+            try:
+                yield element
+            except StopIteration:
+                pass
+    else:
+        it = iter(range(n))
+        for i, element in enumerate(iterator):
+            try:
+                nexti = next(it)
+                yield element
+            except StopIteration:
+                pass
 
 
 class DateExactFilter(AttributeFilter):
