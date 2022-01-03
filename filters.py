@@ -169,6 +169,7 @@ def limit(iterator, n=None):
 
 
 class DateFilter(AttributeFilter):
+    """A date filter class based on approach date"""
     def __init__(self, op, value):
         self.op = op
         self.value = value
@@ -182,6 +183,7 @@ class DateFilter(AttributeFilter):
 
 
 class DistanceFilter(AttributeFilter):
+    """A distance filter class based on approach distance"""
     def __init__(self, op, value):
         self.op = op
         self.value = value
@@ -195,6 +197,7 @@ class DistanceFilter(AttributeFilter):
 
 
 class VelocityFilter(AttributeFilter):
+    """A velocity filter class based on approach velocity"""
     def __init__(self, op, value):
         self.op = op
         self.value = value
@@ -208,6 +211,7 @@ class VelocityFilter(AttributeFilter):
 
 
 class DiameterFilter(AttributeFilter):
+    """A diameter filter class based on approach neo diameter"""
     def __init__(self, op, value):
         self.op = op
         self.value = value
@@ -221,6 +225,7 @@ class DiameterFilter(AttributeFilter):
 
 
 class HazardousFilter(AttributeFilter):
+    """A hazardous filter class based on approach neo hazard"""
     def __init__(self, op, value):
         self.op = op
         self.value = value
