@@ -111,6 +111,18 @@ def create_filters(
     # TODO: Decide how you will represent your filters.
     filters = []
 
+    if date is not None:
+        date_exact_filter = DateExactFilter(operator.eq, date)
+        filters.append(date_exact_filter)
+    
+    if start_date is not None:
+        date_start_date_filter = DateStartDateFilter(operator.ge, start_date)
+        filters.append(date_start_date_filter)
+
+    if end_date is not None:
+        date_end_date_filter = DateEndDateFilter(operator.le, end_date)
+        filters.append(date_end_date_filter)
+
     if distance_min is not None:
         distance_min_filter = DistanceMinFilter(operator.ge, distance_min)
         filters.append(distance_min_filter)
@@ -127,8 +139,15 @@ def create_filters(
         velocity_max_filter = VelocityMaxFilter(operator.le, velocity_max)
         filters.append(velocity_max_filter)
 
+    if diameter_min is not None:
+        diameter_min_filter = DiameterMinFilter(operator.ge, diameter_min)
+        filters.append(diameter_min_filter)
+
+    if diameter_max is not None:
+        diameter_max_filter = DiameterMaxFilter(operator.le, diameter_max)
+        filters.append(diameter_max_filter)
+
     if hazardous is not None:
-        print(hazardous)
         hazardous_filter = HazardousFilter(operator.eq, hazardous)
         filters.append(hazardous_filter)
 
@@ -146,6 +165,45 @@ def limit(iterator, n=None):
     """
     # TODO: Produce at most `n` values from the given iterator.
     return iterator
+
+
+class DateExactFilter(AttributeFilter):
+    def __init__(self, op, value):
+        self.op = op
+        self.value = value
+    
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.time.date()
+
+
+class DateStartDateFilter(AttributeFilter):
+    def __init__(self, op, value):
+        self.op = op
+        self.value = value
+    
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.time.date()
+
+
+class DateEndDateFilter(AttributeFilter):
+    def __init__(self, op, value):
+        self.op = op
+        self.value = value
+    
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.time.date()
 
 
 class DistanceMinFilter(AttributeFilter):
@@ -202,6 +260,34 @@ class VelocityMaxFilter(AttributeFilter):
     @classmethod
     def get(cls, approach):
         return approach.velocity
+
+
+class DiameterMinFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - diameter_min: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.diameter
+
+
+class DiameterMaxFilter(AttributeFilter):
+    def __init__(self, op, value):
+        # print("filter - diameter_max: ", value)
+        self.op = op
+        self.value = value
+
+    def __call__(self, approach):
+        return self.op(self.get(approach), self.value)
+
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.diameter
 
 
 class HazardousFilter(AttributeFilter):
