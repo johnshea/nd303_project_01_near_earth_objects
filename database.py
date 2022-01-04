@@ -119,7 +119,7 @@ class NEODatabase:
         """
         for approach in self._approaches:
             result = True
-            for f in filters:
-                result = result and f(approach)
+            for filter in filters:
+                result &= filter(approach)
             if result:
                 yield approach
