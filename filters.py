@@ -111,34 +111,34 @@ def create_filters(
     filters = []
 
     if date is not None:
-        filters.append(DateFilter(operator.eq, date))
+        filters.append(CreateFilter(operator.eq, date, 'approach.time', fn='date'))
     
     if start_date is not None:
-        filters.append(DateFilter(operator.ge, start_date))
+        filters.append(CreateFilter(operator.ge, start_date, 'approach.time', fn='date'))
 
     if end_date is not None:
-        filters.append(DateFilter(operator.le, end_date))
+        filters.append(CreateFilter(operator.le, end_date, 'approach.time', fn='date'))
 
     if distance_min is not None:
-        filters.append(DistanceFilter(operator.ge, distance_min))
+        filters.append(CreateFilter(operator.ge, distance_min, 'approach.distance'))
 
     if distance_max is not None:
-        filters.append(DistanceFilter(operator.le, distance_max))
+        filters.append(CreateFilter(operator.le, distance_max, 'approach.distance'))
 
     if velocity_min is not None:
-        filters.append(VelocityFilter(operator.ge, velocity_min))
+        filters.append(CreateFilter(operator.ge, velocity_min, 'approach.velocity'))
 
     if velocity_max is not None:
-        filters.append(VelocityFilter(operator.le, velocity_max))
+        filters.append(CreateFilter(operator.le, velocity_max, 'approach.velocity'))
 
     if diameter_min is not None:
-        filters.append(DiameterFilter(operator.ge, diameter_min))
+        filters.append(CreateFilter(operator.ge, diameter_min, 'approach.neo.diameter'))
 
     if diameter_max is not None:
-        filters.append(DiameterFilter(operator.le, diameter_max))
+        filters.append(CreateFilter(operator.le, diameter_max, 'approach.neo.diameter'))
 
     if hazardous is not None:
-        filters.append(HazardousFilter(operator.eq, hazardous))
+        filters.append(CreateFilter(operator.eq, hazardous, 'approach.neo.hazardous'))
 
     return filters
 
@@ -168,71 +168,31 @@ def limit(iterator, n=None):
                 pass
 
 
-class DateFilter(AttributeFilter):
-    """A date filter class based on approach date"""
-    def __init__(self, op, value):
-        self.op = op
-        self.value = value
-    
-    def __call__(self, approach):
-        return self.op(self.get(approach), self.value)
-
-    @classmethod
-    def get(cls, approach):
-        return approach.time.date()
+def CreateFilter(op, value, param, fn=None):
+    """A function that creates a filter class object based on the passed in parameters"""
 
 
-class DistanceFilter(AttributeFilter):
-    """A distance filter class based on approach distance"""
-    def __init__(self, op, value):
-        self.op = op
-        self.value = value
+    class GeneralFilter(AttributeFilter):
+        def __init__(self):
+            self.op = op
+            self.value = value
 
-    def __call__(self, approach):
-        return self.op(self.get(approach), self.value)
+        def __call__(self, approach):
+            return self.op(self.get(approach), self.value)
 
-    @classmethod
-    def get(cls, approach):
-        return approach.distance
+        @classmethod
+        def get(cls, approach):
+            params = param.split('.')
 
+            v = locals()[params[0]]
 
-class VelocityFilter(AttributeFilter):
-    """A velocity filter class based on approach velocity"""
-    def __init__(self, op, value):
-        self.op = op
-        self.value = value
+            for elem in params[1:]:
+                v = getattr(v, elem)
 
-    def __call__(self, approach):
-        return self.op(self.get(approach), self.value)
-
-    @classmethod
-    def get(cls, approach):
-        return approach.velocity
+            if fn:
+                return getattr(v, fn)()
+            else:
+                return v
 
 
-class DiameterFilter(AttributeFilter):
-    """A diameter filter class based on approach neo diameter"""
-    def __init__(self, op, value):
-        self.op = op
-        self.value = value
-
-    def __call__(self, approach):
-        return self.op(self.get(approach), self.value)
-
-    @classmethod
-    def get(cls, approach):
-        return approach.neo.diameter
-
-
-class HazardousFilter(AttributeFilter):
-    """A hazardous filter class based on approach neo hazard"""
-    def __init__(self, op, value):
-        self.op = op
-        self.value = value
-
-    def __call__(self, approach):
-        return self.op(self.get(approach), self.value)
-
-    @classmethod
-    def get(cls, approach):
-        return approach.neo.hazardous
+    return GeneralFilter()
