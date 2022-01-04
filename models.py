@@ -47,9 +47,9 @@ class NearEarthObject:
         else:
             self.name = None
 
-        if info.get('diameter'):
+        try:
             self.diameter = float(info.get('diameter'))
-        else:
+        except Exception:
             self.diameter = float('nan')
 
         if info.get('pha'):
@@ -117,14 +117,14 @@ class CloseApproach:
 
         self.time = cd_to_datetime(info['cd'])
 
-        if info.get('dist') is not None:
+        try:
             self.distance = float(info.get('dist'))
-        else:
+        except Exception:
             self.distance = 0.0
 
-        if info.get('v_rel') is not None:
+        try:
             self.velocity = float(info.get('v_rel'))
-        else:
+        except Exception:
             self.velocity = 0.0
 
         # Create an attribute for the referenced NEO, originally None.
